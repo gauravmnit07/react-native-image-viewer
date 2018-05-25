@@ -1,6 +1,6 @@
 import * as React from "react"
-import { Image, ImageURISource, Text, View, ViewStyle } from "react-native"
-import { simpleStyle } from "./image-viewer.style"
+import {Image, ImageURISource, Text, View, ViewStyle} from "react-native"
+import {simpleStyle} from "./image-viewer.style"
 
 export class Props {
   /**
@@ -90,45 +90,37 @@ export class Props {
   /**
    * 自定义头部
    */
-  public renderHeader?: (
-    currentIndex?: number
-  ) => React.ReactElement<any> = () => {
+  public renderHeader?: (currentIndex?: number) => React.ReactElement<any> = () => {
     return null as any
   }
 
   /**
    * 自定义尾部
    */
-  public renderFooter?: (
-    currentIndex?: number
-  ) => React.ReactElement<any> = () => {
+  public renderFooter?: (currentIndex?: number) => React.ReactElement<any> = () => {
     return null as any
   }
 
   /**
    * 自定义计时器
    */
-  public renderIndicator?: (
-    currentIndex?: number,
-    allSize?: number
-  ) => React.ReactElement<any> = (currentIndex: number, allSize: number) => {
+  public renderIndicator?: (currentIndex?: number,
+                            allSize?: number) => React.ReactElement<any> = (currentIndex: number, allSize: number) => {
     return React.createElement(
-      View,
-      { style: simpleStyle.count },
-      React.createElement(
-        Text,
-        { style: simpleStyle.countText },
-        currentIndex + "/" + allSize
-      )
+        View,
+        {style: simpleStyle.count},
+        React.createElement(
+            Text,
+            {style: simpleStyle.countText},
+            currentIndex + "/" + allSize
+        )
     )
   }
 
   /**
    * Render image component
    */
-  public renderImage?: (
-    props: any
-  ) => React.ReactElement<any> = (props: any) => {
+  public renderImage?: (props: any) => React.ReactElement<any> = (props: any) => {
     return React.createElement(Image, props)
   }
 
@@ -184,8 +176,12 @@ export class Props {
   /**
    * 当图片切换时触发
    */
-  public onChange?: (index?: number) => void = () => {
+  public onChange?: (index?: number, prevIndex?: number) => void = () => {
     //
+  }
+
+  public renderNode?: (image?: any, index?: number, Wrapper?: any) => any = () => {
+    return null as any;
   }
 }
 
