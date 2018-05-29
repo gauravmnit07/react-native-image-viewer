@@ -7,12 +7,14 @@ import {
 } from "react-native";
 import Zoom from "react-native-image-pan-zoom";
 import styles from "./image-viewer.style";
-import { IMedia, Props, State} from "./image-viewer.type";
+import {IMedia, Props, State} from "./image-viewer.type";
 
 export default class ImageViewer extends React.Component<Props, State> {
   public static defaultProps = new Props();
   public state = new State();
 
+  public animationDuration = 250;
+  public maxTranslate = 0;
   // 背景透明度渐变动画
   private fadeAnim = new Animated.Value(0);
 
@@ -51,7 +53,7 @@ export default class ImageViewer extends React.Component<Props, State> {
           // 显示动画
           Animated.timing(this.fadeAnim, {
             toValue: 1,
-            duration: 200
+            duration: this.animationDuration
           }).start();
         }
       );
@@ -80,7 +82,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         // 显示动画
         Animated.timing(this.fadeAnim, {
           toValue: 1,
-          duration: 200
+          duration: this.animationDuration
         }).start();
       }
     );
@@ -101,6 +103,14 @@ export default class ImageViewer extends React.Component<Props, State> {
    */
   public handleHorizontalOuterRangeOffset = (offsetX: number) => {
     this.positionXNumber = this.standardPositionX + offsetX;
+    if (!this.props.bounces) {
+      if (this.positionXNumber > 0 || this.positionXNumber < -this.maxTranslate) {
+        return;
+      }
+    }
+    if (this.positionXNumber > 0 || this.positionXNumber < -this.maxTranslate) {
+      this.positionXNumber = this.standardPositionX + (offsetX / (this!.props!.bounceResistance || 3.5));
+    }
     this.positionX.setValue(this.positionXNumber);
   };
 
@@ -111,14 +121,14 @@ export default class ImageViewer extends React.Component<Props, State> {
     const vxRTL = I18nManager.isRTL ? -vx : vx;
     const isLeftMove = I18nManager.isRTL
       ? this.positionXNumber - this.standardPositionX <
-        -(this.props.flipThreshold || 0)
+      -(this.props.flipThreshold || 0)
       : this.positionXNumber - this.standardPositionX >
-        (this.props.flipThreshold || 0);
+      (this.props.flipThreshold || 0);
     const isRightMove = I18nManager.isRTL
       ? this.positionXNumber - this.standardPositionX >
-        (this.props.flipThreshold || 0)
+      (this.props.flipThreshold || 0)
       : this.positionXNumber - this.standardPositionX <
-        -(this.props.flipThreshold || 0);
+      -(this.props.flipThreshold || 0);
 
     if (vxRTL > 0.7) {
       // 上一张
@@ -160,7 +170,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.standardPositionX = this.positionXNumber;
     Animated.timing(this.positionX, {
       toValue: this.positionXNumber,
-      duration: 100
+      duration: this.animationDuration
     }).start();
 
     const nextIndex = (this.state.currentShowIndex || 0) - 1;
@@ -193,7 +203,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.standardPositionX = this.positionXNumber;
     Animated.timing(this.positionX, {
       toValue: this.positionXNumber,
-      duration: 100
+      duration: this.animationDuration
     }).start();
 
     const nextIndex = (this.state.currentShowIndex || 0) + 1;
@@ -218,7 +228,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.positionXNumber = this.standardPositionX;
     Animated.timing(this.positionX, {
       toValue: this.standardPositionX,
-      duration: 150
+      duration: this.animationDuration
     }).start();
   }
 
@@ -287,6 +297,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     // 获得屏幕宽高
     const screenWidth = this.width;
     const screenHeight = this.height;
+    this.maxTranslate = this.width * ((this!.props!.mediaList!.length || 1) - 1);
     if (this.hasLayout) {
       this.ImageElements = this!.props!.mediaList!.map((image, index) => {
         if (
@@ -363,7 +374,7 @@ export default class ImageViewer extends React.Component<Props, State> {
           )}
           <View
             style={[
-              { bottom: 0, position: "absolute", zIndex: 9999 },
+              {bottom: 0, position: "absolute", zIndex: 9999},
               this.props.footerContainerStyle
             ]}
           >
